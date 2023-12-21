@@ -1,10 +1,18 @@
 import { createApp } from 'vue';
-import './tw.css';
 import './app.css';
-import App from './app.vue';
+import App from './app.vue'
 
-const app = createApp(App);
+// Vuetify
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
 
-app.mount('#app');
+const vuetify = createVuetify({
+  components,
+  directives,
+})
 
-export default app;
+createApp(App).use(vuetify).mount('#app')
+
+export default App;

@@ -24,19 +24,8 @@
                 </v-toolbar>
               </template>
               <template v-slot:item.actions="{ item }">
-                <v-icon
-                  small
-                  @click="editGuest(item)"
-                  class="mr-2"
-                >
-                  mdi-pencil
-                </v-icon>
-                <v-icon
-                  small
-                  @click="deleteGuest(item)"
-                >
-                  mdi-delete
-                </v-icon>
+                <v-btn @click="editGuest(item)" color="secondary" variant="tonal">Edit</v-btn>
+                <v-btn @click="deleteGuest(item)" color="red-lighten-2" variant="tonal">Delete</v-btn>
               </template>
             </v-data-table>
           </v-card-text>
@@ -68,18 +57,24 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import GuestRepository from 'src/services/guest-repository';
 
-export default {
+interface Guest {
+  email: string;
+  tickets: number;
+}
+
+export default defineComponent({
   data() {
     return {
-      guests: [],
+      guests: [] as Guest[],
       showAddGuestModal: false,
       newGuest: {
         email: '',
-        tickets: 0,
-      },
+        tickets: 1, // Set the default ticket value to 1
+      } as Guest,
       editingIndex: -1,
       search: '',
       headers: [
@@ -93,27 +88,34 @@ export default {
     this.guests = await new GuestRepository().load();
   },
   computed: {
-    totalGuests() {
-      return this.guests.reduce((total, guest) => total + guest.tickets, 0);
+    totalGuests(): number {
+      return this.guests.reduce((total, guest) => total + Number(guest.tickets), 0);
+      // Ensure the 'tickets' property is treated as a number
     },
   },
   methods: {
-    editGuest(item) {
+    editGuest(item: Guest): void {
       const index = this.guests.indexOf(item);
       this.editingIndex = index;
       this.newGuest = { ...item };
       this.showAddGuestModal = true;
     },
-    deleteGuest(item) {
+    deleteGuest(item: Guest): void {
       const index = this.guests.indexOf(item);
       this.guests.splice(index, 1);
       this.saveGuests();
     },
-    openAddGuestModal() {
-      this.newGuest = { email: '', tickets: 0 };
+    openAddGuestModal(): void {
+      this.newGuest = { email: '', tickets: 1 }; // Set the default ticket value to 1
       this.showAddGuestModal = true;
     },
-    addGuest() {
+    addGuest(): void {
+      if (this.totalGuests + Number(this.newGuest.tickets) > 20) {
+        // Limit the total number of guests to 20
+        alert('Sorry, the party can only fit 20 guests!');
+        return;
+      }
+
       if (this.editingIndex > -1) {
         // Editing existing guest
         this.guests.splice(this.editingIndex, 1, this.newGuest);
@@ -125,17 +127,13 @@ export default {
       this.saveGuests();
       this.showAddGuestModal = false;
     },
-    cancelAddGuest() {
+    cancelAddGuest(): void {
       this.showAddGuestModal = false;
       this.editingIndex = -1;
     },
-    async saveGuests() {
+    async saveGuests(): Promise<void> {
       await new GuestRepository().save(this.guests);
     },
   },
-};
+});
 </script>
-
-<style scoped>
-/* Add your custom styles here if needed */
-</style>
