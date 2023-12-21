@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <main
     class="
       h-full w-full
@@ -10,7 +10,6 @@
 
     <main-content></main-content>
 
-    <!-- optional: you can remove this readme -->
     <read-me
       class="
         p-4 m-4
@@ -25,4 +24,20 @@
 import NavBar from 'src/components/nav-bar.vue';
 import MainContent from 'src/components/main-content.vue';
 import ReadMe from 'src/components/read-me.vue';
+</script> -->
+
+<template>
+  <div id="app">
+    <router-view />
+  </div>
+</template>
+
+<script lang="ts">
+export default {
+  name: 'App',
+};
 </script>
+
+<style>
+/* Add your global styles here if needed */
+</style>
