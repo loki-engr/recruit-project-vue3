@@ -35,7 +35,6 @@
           </v-card-actions>
         </v-card>
 
-        <!-- Add Guest Modal -->
         <v-dialog v-model="showAddGuestModal" max-width="600">
           <v-card>
             <v-card-title class="headline">{{ editingIndex > -1 ? 'Edit Guest' : 'Add Guest' }}</v-card-title>
@@ -73,7 +72,7 @@ export default defineComponent({
       showAddGuestModal: false,
       newGuest: {
         email: '',
-        tickets: 1, // Set the default ticket value to 1
+        tickets: 1,
       } as Guest,
       editingIndex: -1,
       search: '',
@@ -90,7 +89,6 @@ export default defineComponent({
   computed: {
     totalGuests(): number {
       return this.guests.reduce((total, guest) => total + Number(guest.tickets), 0);
-      // Ensure the 'tickets' property is treated as a number
     },
   },
   methods: {
@@ -106,22 +104,23 @@ export default defineComponent({
       this.saveGuests();
     },
     openAddGuestModal(): void {
-      this.newGuest = { email: '', tickets: 1 }; // Set the default ticket value to 1
+      this.newGuest = { email: '', tickets: 1 };
       this.showAddGuestModal = true;
     },
     addGuest(): void {
-      if (this.totalGuests + Number(this.newGuest.tickets) > 20) {
-        // Limit the total number of guests to 20
+      const newTickets = Number(this.newGuest.tickets);
+      const editingGuestTickets = this.editingIndex > -1 ? this.guests[this.editingIndex].tickets : 0;
+      const totalTickets = this.totalGuests - editingGuestTickets + newTickets;
+
+      if (totalTickets > 20) {
         alert('Sorry, the party can only fit 20 guests!');
         return;
       }
 
       if (this.editingIndex > -1) {
-        // Editing existing guest
         this.guests.splice(this.editingIndex, 1, this.newGuest);
         this.editingIndex = -1;
       } else {
-        // Adding new guest
         this.guests.push(this.newGuest);
       }
       this.saveGuests();
